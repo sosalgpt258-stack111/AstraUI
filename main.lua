@@ -1,7 +1,7 @@
 -- Astra Main Script (main.lua)
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/sosalgpt258-stack111/miniature-goggles/main/lib.lua"))()
-local ESPModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/sosalgpt258-stack111/miniature-goggles/main/esp.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/sosalgpt258-stack111/AstraUI/main/lib.lua"))()
+local ESPModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/sosalgpt258-stack111/AstraUI/main/esp.lua"))()
 
 -- Инициализация окна
 local Window = Library.New()
@@ -21,18 +21,26 @@ esp.SetMaxDistance(500)
 
 visualsCol:CreateToggle("box corners", function(state)
     esp.SetEnabled(state)
+end, function()
+    -- Callback для шестерёнки боксов
 end)
 
 visualsCol:CreateToggle("health bar", function(state)
     esp.SetHealthBarEnabled(state)
+end, function()
+    -- Callback для шестерёнки хелсбара
 end)
 
 visualsCol:CreateToggle("name esp", function(state)
     esp.SetNameEnabled(state)
+end, function()
+    -- Callback для шестерёнки ников
 end)
 
 visualsCol:CreateToggle("distance esp", function(state)
     esp.SetDistanceEnabled(state)
+end, function()
+    -- Callback для шестерёнки дистанции
 end)
 
 -- Колонка настроек
