@@ -7,8 +7,6 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Stats = game:GetService("Stats")
 local TweenService = game:GetService("TweenService")
-local Camera = workspace.CurrentCamera
-local localPlayer = Players.LocalPlayer
 
 function Library.New()
     if CoreGui:FindFirstChild("AstraStyleMenu") then
@@ -81,7 +79,7 @@ function Library.New()
         end
     end)
 
-    -- Главное меню
+    -- Главное окно
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
@@ -324,7 +322,6 @@ function Library.New()
                 TglStroke.Thickness = 1
                 TglStroke.Parent = Tgl
 
-                -- Если есть доп. настройки, смещаем чекбокс левее для 3 точек
                 local indicatorOffset = settingsCallback and -32 or -10
 
                 local Indicator = Instance.new("Frame")
@@ -354,7 +351,6 @@ function Library.New()
                 Checkmark.TextSize = 13
                 Checkmark.TextTransparency = 1
 
-                -- Кнопка с тремя точками (...)
                 if settingsCallback then
                     local DotsBtn = Instance.new("TextButton")
                     DotsBtn.Name = "DotsButton"
@@ -404,7 +400,6 @@ function Library.New()
         return TabObj
     end
 
-    -- Логика вылета по Insert
     local menuVisible = false
     local animating = false
 
