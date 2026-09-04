@@ -324,12 +324,15 @@ function Library.New()
                 TglStroke.Thickness = 1
                 TglStroke.Parent = Tgl
 
+                -- Если есть доп. настройки, смещаем чекбокс левее для 3 точек
+                local indicatorOffset = settingsCallback and -32 or -10
+
                 local Indicator = Instance.new("Frame")
                 Indicator.Parent = Tgl
                 Indicator.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
                 Indicator.BorderSizePixel = 0
                 Indicator.AnchorPoint = Vector2.new(1, 0.5)
-                Indicator.Position = UDim2.new(1, -10, 0.5, 0)
+                Indicator.Position = UDim2.new(1, indicatorOffset, 0.5, 0)
                 Indicator.Size = UDim2.new(0, 18, 0, 18)
 
                 local IndCorner = Instance.new("UICorner")
@@ -351,26 +354,29 @@ function Library.New()
                 Checkmark.TextSize = 13
                 Checkmark.TextTransparency = 1
 
+                -- Кнопка с тремя точками (...)
                 if settingsCallback then
-                    local SettingsBtn = Instance.new("ImageButton")
-                    SettingsBtn.Name = "SettingsButton"
-                    SettingsBtn.Parent = Tgl
-                    SettingsBtn.BackgroundTransparency = 1
-                    SettingsBtn.AnchorPoint = Vector2.new(1, 0.5)
-                    SettingsBtn.Position = UDim2.new(1, -34, 0.5, 0)
-                    SettingsBtn.Size = UDim2.new(0, 16, 0, 16)
-                    SettingsBtn.Image = "rbxassetid://7072719181"
-                    SettingsBtn.ImageColor3 = Color3.fromRGB(140, 140, 150)
+                    local DotsBtn = Instance.new("TextButton")
+                    DotsBtn.Name = "DotsButton"
+                    DotsBtn.Parent = Tgl
+                    DotsBtn.BackgroundTransparency = 1
+                    DotsBtn.AnchorPoint = Vector2.new(1, 0.5)
+                    DotsBtn.Position = UDim2.new(1, -6, 0.5, -1)
+                    DotsBtn.Size = UDim2.new(0, 20, 0, 20)
+                    DotsBtn.Font = Enum.Font.GothamBold
+                    DotsBtn.Text = "•••"
+                    DotsBtn.TextColor3 = Color3.fromRGB(150, 150, 160)
+                    DotsBtn.TextSize = 11
 
-                    SettingsBtn.MouseEnter:Connect(function()
-                        TweenService:Create(SettingsBtn, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(220, 220, 230)}):Play()
+                    DotsBtn.MouseEnter:Connect(function()
+                        TweenService:Create(DotsBtn, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
                     end)
 
-                    SettingsBtn.MouseLeave:Connect(function()
-                        TweenService:Create(SettingsBtn, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(140, 140, 150)}):Play()
+                    DotsBtn.MouseLeave:Connect(function()
+                        TweenService:Create(DotsBtn, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(150, 150, 160)}):Play()
                     end)
 
-                    SettingsBtn.MouseButton1Click:Connect(function()
+                    DotsBtn.MouseButton1Click:Connect(function()
                         settingsCallback()
                     end)
                 end
