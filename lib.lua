@@ -303,14 +303,14 @@ function Library.New()
                 Btn.MouseButton1Click:Connect(callback)
             end
 
-            function ColObj:CreateToggle(text, callback)
+            function ColObj:CreateToggle(text, callback, settingsCallback)
                 local Tgl = Instance.new("TextButton")
                 Tgl.Parent = ListContainer
                 Tgl.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
                 Tgl.Size = UDim2.new(0.9, 0, 0, 30)
                 Tgl.AutoButtonColor = false
                 Tgl.Font = Enum.Font.GothamMedium
-                Tgl.Text = "   " .. text
+                Tgl.Text = "    " .. text
                 Tgl.TextColor3 = Color3.fromRGB(200, 200, 210)
                 Tgl.TextSize = 12
                 Tgl.TextXAlignment = Enum.TextXAlignment.Left
@@ -350,6 +350,30 @@ function Library.New()
                 Checkmark.TextColor3 = Color3.fromRGB(12, 12, 15)
                 Checkmark.TextSize = 13
                 Checkmark.TextTransparency = 1
+
+                if settingsCallback then
+                    local SettingsBtn = Instance.new("ImageButton")
+                    SettingsBtn.Name = "SettingsButton"
+                    SettingsBtn.Parent = Tgl
+                    SettingsBtn.BackgroundTransparency = 1
+                    SettingsBtn.AnchorPoint = Vector2.new(1, 0.5)
+                    SettingsBtn.Position = UDim2.new(1, -34, 0.5, 0)
+                    SettingsBtn.Size = UDim2.new(0, 16, 0, 16)
+                    SettingsBtn.Image = "rbxassetid://7072719181"
+                    SettingsBtn.ImageColor3 = Color3.fromRGB(140, 140, 150)
+
+                    SettingsBtn.MouseEnter:Connect(function()
+                        TweenService:Create(SettingsBtn, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(220, 220, 230)}):Play()
+                    end)
+
+                    SettingsBtn.MouseLeave:Connect(function()
+                        TweenService:Create(SettingsBtn, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(140, 140, 150)}):Play()
+                    end)
+
+                    SettingsBtn.MouseButton1Click:Connect(function()
+                        settingsCallback()
+                    end)
+                end
 
                 local state = false
                 Tgl.MouseButton1Click:Connect(function()
