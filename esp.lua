@@ -12,11 +12,23 @@ function ESPModule.Init()
     local nameEnabled = false
     local distanceEnabled = false
     local maxDistance = 500
+    local boxColor = Color3.fromRGB(255, 255, 255)
+    local nameFont = Drawing.Fonts.Plex
+    local boxTeamCheck = false
+    local healthTeamCheck = false
     local espCache = {}
     local renderConnection = nil
 
-    local function CreateDrawing(type, properties)
-        local drawing = Drawing.new(type)
+    local function GetTeam(player)
+        return player.Team
+    end
+
+    local function IsSameTeam(player)
+        return GetTeam(player) ~= nil and GetTeam(player) == GetTeam(localPlayer)
+    end
+
+    local function CreateDrawing(drawType, properties)
+        local drawing = Drawing.new(drawType)
         for k, v in pairs(properties) do
             drawing[k] = v
         end
@@ -26,16 +38,16 @@ function ESPModule.Init()
     local function CreatePlayerESP(player)
         if espCache[player] then return end
         espCache[player] = {
-            TL1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            TL2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            TR1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            TR2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            BL1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            BL2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            BR1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
-            BR2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = Color3.fromRGB(255, 255, 255)}),
+            TL1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            TL2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            TR1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            TR2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            BL1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            BL2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            BR1 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
+            BR2 = CreateDrawing("Line", {Visible = false, Thickness = 1.5, Color = boxColor}),
             HealthBar = CreateDrawing("Line", {Visible = false, Thickness = 2, Color = Color3.fromRGB(0, 255, 0)}),
-            NameText = CreateDrawing("Text", {Visible = false, Size = 14, Center = true, Outline = true, Color = Color3.fromRGB(255, 255, 255)}),
+            NameText = CreateDrawing("Text", {Visible = false, Size = 14, Center = true, Outline = true, Color = Color3.fromRGB(255, 255, 255), Font = nameFont}),
             DistanceText = CreateDrawing("Text", {Visible = false, Size = 13, Center = false, Outline = true, Color = Color3.fromRGB(255, 255, 255)})
         }
     end
@@ -78,6 +90,7 @@ function ESPModule.Init()
             local character = player.Character
             local rootPart = character and character:FindFirstChild("HumanoidRootPart")
             local humanoid = character and character:FindFirstChild("Humanoid")
+            local sameTeam = IsSameTeam(player)
 
             local visible = false
             if localRoot and character and rootPart and humanoid and humanoid.Health > 0 then
@@ -98,21 +111,24 @@ function ESPModule.Init()
                         local y = topVector.Y
                         local length = math.clamp(width / 4, 6, 15)
 
-                        -- 1. Боксы (с исправленными углами)
-                        if boxEnabled then
-                            lines.TL1.From = Vector2.new(x, y) lines.TL1.To = Vector2.new(x + length, y)
-                            lines.TL2.From = Vector2.new(x, y) lines.TL2.To = Vector2.new(x, y + length)
+                        -- 1. Боксы с team check
+                        local showBox = boxEnabled and not (boxTeamCheck and sameTeam)
+                        if showBox then
+                            local cornerNames = {"TL1", "TL2", "TR1", "TR2", "BL1", "BL2", "BR1", "BR2"}
+                            for _, name in ipairs(cornerNames) do
+                                lines[name].Color = boxColor
+                            end
 
-                            lines.TR1.From = Vector2.new(x + width, y) lines.TR1.To = Vector2.new(x + width - length, y)
-                            lines.TR2.From = Vector2.new(x + width, y) lines.TR2.To = Vector2.new(x + width, y + length)
-
+                            lines.TL1.From = Vector2.new(x, y)          lines.TL1.To = Vector2.new(x + length, y)
+                            lines.TL2.From = Vector2.new(x, y)          lines.TL2.To = Vector2.new(x, y + length)
+                            lines.TR1.From = Vector2.new(x + width, y)  lines.TR1.To = Vector2.new(x + width - length, y)
+                            lines.TR2.From = Vector2.new(x + width, y)  lines.TR2.To = Vector2.new(x + width, y + length)
                             lines.BL1.From = Vector2.new(x, y + height) lines.BL1.To = Vector2.new(x + length, y + height)
                             lines.BL2.From = Vector2.new(x, y + height) lines.BL2.To = Vector2.new(x, y + height - length)
-
                             lines.BR1.From = Vector2.new(x + width, y + height) lines.BR1.To = Vector2.new(x + width - length, y + height)
                             lines.BR2.From = Vector2.new(x + width, y + height) lines.BR2.To = Vector2.new(x + width, y + height - length)
 
-                            for _, name in ipairs({"TL1", "TL2", "TR1", "TR2", "BL1", "BL2", "BR1", "BR2"}) do
+                            for _, name in ipairs(cornerNames) do
                                 lines[name].Visible = true
                             end
                         else
@@ -121,11 +137,11 @@ function ESPModule.Init()
                             end
                         end
 
-                        -- 2. Хелсбар (слева, толщина 2)
-                        if healthBarEnabled then
+                        -- 2. Health bar с team check
+                        local showHealth = healthBarEnabled and not (healthTeamCheck and sameTeam)
+                        if showHealth then
                             local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
-                            local barX = boxEnabled and (x - 6) or (x + 2)
-                            
+                            local barX = showBox and (x - 6) or (x + 2)
                             local currentHeight = height * healthPercent
                             lines.HealthBar.From = Vector2.new(barX, y + height)
                             lines.HealthBar.To = Vector2.new(barX, y + height - currentHeight)
@@ -135,8 +151,9 @@ function ESPModule.Init()
                             lines.HealthBar.Visible = false
                         end
 
-                        -- 3. Никнейм (сверху по центру)
+                        -- 3. Никнейм
                         if nameEnabled then
+                            lines.NameText.Font = nameFont
                             lines.NameText.Text = player.Name
                             lines.NameText.Position = Vector2.new(x + (width / 2), y - 16)
                             lines.NameText.Visible = true
@@ -144,7 +161,7 @@ function ESPModule.Init()
                             lines.NameText.Visible = false
                         end
 
-                        -- 4. Дистанция (справа от бокса, по центру высоты)
+                        -- 4. Дистанция
                         if distanceEnabled then
                             lines.DistanceText.Text = math.floor(distance) .. "m"
                             lines.DistanceText.Position = Vector2.new(x + width + 5, y + (height / 2) - 6)
@@ -167,11 +184,15 @@ function ESPModule.Init()
     end)
 
     return {
-        SetEnabled = function(state) boxEnabled = state end,
-        SetHealthBarEnabled = function(state) healthBarEnabled = state end,
-        SetNameEnabled = function(state) nameEnabled = state end,
-        SetDistanceEnabled = function(state) distanceEnabled = state end,
-        SetMaxDistance = function(distance) maxDistance = distance end,
+        SetEnabled             = function(state) boxEnabled = state end,
+        SetHealthBarEnabled    = function(state) healthBarEnabled = state end,
+        SetNameEnabled         = function(state) nameEnabled = state end,
+        SetDistanceEnabled     = function(state) distanceEnabled = state end,
+        SetMaxDistance         = function(distance) maxDistance = distance end,
+        SetBoxColor            = function(color) boxColor = color end,
+        SetNameFont            = function(font) nameFont = font end,
+        SetBoxTeamCheck        = function(state) boxTeamCheck = state end,
+        SetHealthTeamCheck     = function(state) healthTeamCheck = state end,
         Destroy = function()
             boxEnabled = false
             healthBarEnabled = false
